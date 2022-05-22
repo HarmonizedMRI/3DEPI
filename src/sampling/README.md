@@ -18,4 +18,20 @@ If cloning this 3DEPI repository for the first time, do:
 $ git clone --recursive 
 ```
 
-### Using the function 
+### Run test
+
+Generate CAIPI pattern and plot.
+
+From Python prompt (REPL):
+```
+>>> import test
+```
+
+To run again:
+```
+>>> import importlib
+>>> importlib.reload(test)
+```
+
+
+
