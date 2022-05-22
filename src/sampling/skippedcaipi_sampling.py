@@ -29,6 +29,30 @@ import copy
 # From https://github.com/mrphysics-bonn/skipped-caipi:
 from skippedcaipi.skippedcaipi import elementary_sampling, get_trajectory_indices, plot_parabola_connection, get_zblips, get_zblipcycle
 
+# For calling from linux shell
+# Example usage:  
+#   $ python skippedcaipi_sampling.py 1 6 2 1 64 30
+if __name__ == "__main__":
+    import sys
+    import skippedcaipi_sampling
+
+    Ry = int(sys.argv[1]) # Undersampling factor along y (primary phase encode direction, w.l.o.g.)
+    Rz = int(sys.argv[2]) # Undersampling factor along z (slice direction, w.l.o.g.)
+    Dz = int(sys.argv[3]) # CAIPI shift along z
+    S = int(sys.argv[4])  # Segmentation factor (typically 1, for fMRI)
+
+    matrix_size_y = int(sys.argv[5])
+    matrix_size_z = int(sys.argv[6])
+
+    # Create an instance of the blipped-CAIPI object 
+    blippedcaipi = skippedcaipi_sampling.skippedcaipi_sampling(matrix_size_y, matrix_size_z, Ry, Rz, Dz, SegmentationFactor=S)
+
+    #for echo in range(blippedcaipi.epi_factor(0)//2):
+    #    print(echo, blippedcaipi.indices[0][echo,:])
+
+    # write ky/kz sampling pattern to .mat file
+    blippedcaipi.tomatfile()
+
 class skippedcaipi_sampling:
     def __init__(self, matrix_size_y, matrix_size_z, Ry, Rz, CaipiShiftZ, SegmentationFactor=1):
         self.matrix_size = [matrix_size_y, matrix_size_z]
@@ -129,3 +153,11 @@ class skippedcaipi_sampling:
 
         axes.set_ylabel('Parts')
         axes.set_xlabel('Lines')
+
+    def tomatfile(self):
+        import scipy.io as spio
+        mdict = {"indices": self.indices[0], "matrix_size": self.matrix_size, "R": self.R,
+            "D": self.D, "S": self.S, "mask": self.mask, "samples": self.samples, 
+            "sampling_repeats_z": self.sampling_repeats_z}
+        spio.savemat("caipi.mat", mdict)
+
