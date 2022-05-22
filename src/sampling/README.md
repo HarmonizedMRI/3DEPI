@@ -1,7 +1,6 @@
+# Generate 2D CAIPI sampling patterns (python)
 
-## Generate 2D CAIPI sampling patterns (python)
-
-### Get submodule
+## Setup: Get submodule
 
 The `skippedcaipi` repository (https://github.com/mrphysics-bonn/skipped-caipi)
 is included here as a git submodule.
@@ -18,10 +17,9 @@ If cloning this 3DEPI repository for the first time, do:
 $ git clone --recursive 
 ```
 
-### Run test
+## Run test
 
 Generate CAIPI pattern and plot.
-
 To run from Linux command line:
 ```
 $ python test.py
@@ -30,11 +28,17 @@ $ python test.py
 From Python prompt (REPL):
 ```
 >>> import test
-```
-To run again:
-```
+>>> # To run again:
 >>> import importlib
 >>> importlib.reload(test)
 ```
+
+## Usage example
+
+From linux command line:
+```
+$ python skippedcaipi_sampling.py 1 6 2 1 64 30
+```
+This creates the file `caipi.mat` that can be loaded into Matlab
 
 
