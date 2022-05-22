@@ -1,5 +1,5 @@
 
-## Using the Python function for generating 2D CAIPI sampling patterns
+## Generate 2D CAIPI sampling patterns (python)
 
 ### Get submodule
 
@@ -22,16 +22,19 @@ $ git clone --recursive
 
 Generate CAIPI pattern and plot.
 
+To run from Linux command line:
+```
+$ python test.py
+```
+
 From Python prompt (REPL):
 ```
 >>> import test
 ```
-
 To run again:
 ```
 >>> import importlib
 >>> importlib.reload(test)
 ```
-
 
 
