@@ -1,0 +1,3 @@
+[submodule "src/sampling/skippedcaipi"]
+	path = src/sampling/skippedcaipi
+	url = git@github.com:mrphysics-bonn/skipped-caipi.git
