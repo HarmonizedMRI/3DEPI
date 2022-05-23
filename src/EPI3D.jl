@@ -1,4 +1,4 @@
-module MRIRecon
+module EPI3D
 
 using FFTW: fft, fftshift, bfft, ifftshift
 using LinearAlgebra: Diagonal, dot, norm, svd
