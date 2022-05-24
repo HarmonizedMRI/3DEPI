@@ -21,6 +21,18 @@ function signalmodel(x, s, ϕ, r, tm, km, f, g, γ, Δ)
 end
 
 """
+    signalmodel(x, s, r, km)
+
+Compute k-space data ignoring B0 effects.
+"""
+function signalmodel(x, s, r, km)
+
+    dm = sum(s[n] * cispi(-2 * dot(km, r[n])) * x[n] for n in eachindex(x))
+    return dm
+
+end
+
+"""
     forwardmodel(x, s, ϕ, U, V, Ω)
 
 Compute single coil k-space data from image `x`
@@ -69,12 +81,47 @@ function adjointmodel(y, s, ϕ, U, V, Ω)
 
 end
 
+"""
+    forwardmodel(x, s, Ω)
+
+Compute Cartesian k-space data ignoring B0 effects.
+"""
+
+function forwardmodel(x, s, Ω)
+
+    y = ffts(s .* x)[Ω]
+    return y
+
+end
+
+"""
+    adjointmodel(y, s, Ω)
+
+Compute image data ignoring B0 effects.
+"""
+function adjointmodel(y, s, Ω)
+
+    y0 = zeros(eltype(y), size(Ω))
+    y0[Ω] = y
+    x = conj.(s) .* bffts(y0)
+    return x
+
+end
+
 ffts(X) = fftshift(fft(ifftshift(X)))
 bffts(Y) = fftshift(bfft(ifftshift(Y)))
 
 encodingmatrix(s, ϕ, U, V, Ω) = LinearMapAA(
     x -> forwardmodel(x, s, ϕ, U, V, Ω),
     y -> adjointmodel(y, s, ϕ, U, V, Ω),
+    (count(Ω), length(Ω));
+    idim = size(Ω),
+    T = ComplexF64
+)
+
+encodingmatrix(s, Ω) = LinearMapAA(
+    x -> forwardmodel(x, s, Ω),
+    y -> adjointmodel(y, s, Ω),
     (count(Ω), length(Ω));
     idim = size(Ω),
     T = ComplexF64

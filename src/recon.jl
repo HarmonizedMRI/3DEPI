@@ -25,6 +25,19 @@ function recon(y, s, ϕ, U, V, Ω; kwargs...)
 
 end
 
+"""
+    recon(y, s, Ω; λ, kwargs...)
+
+Reconstruct an image ignoring B0 effects,
+assuming Cartesian k-space sampling.
+"""
+function recon(y, s, Ω; kwargs...)
+
+    A = [encodingmatrix(s, Ω) for s in s]
+    _recon(y, s, A, Ω; kwargs...)
+
+end
+
 function _recon(y, s, A, Ω; λ = 0, kwargs...)
 
     ncoils = length(s)
