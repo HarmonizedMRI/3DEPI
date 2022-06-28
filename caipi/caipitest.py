@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+
 import numpy as np
 import matplotlib.pyplot as plt
 import copy
-# From https://github.com/mrphysics-bonn/skipped-caipi:
-from skippedcaipi.skippedcaipi import elementary_sampling, get_trajectory_indices, plot_parabola_connection, get_zblips, get_zblipcycle
+
+#from skippedcaipi import elementary_sampling, get_trajectory_indices, plot_parabola_connection, get_zblips, get_zblipcycle
 
 import skippedcaipi_sampling
 
