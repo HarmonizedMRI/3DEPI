@@ -1,9 +1,6 @@
 # SMS/3D EPI SENSE recon with/without B0 correction
 
-This documentation is WIP
-
 Can also correct for through-voxel B0 gradients.  
-Author: Steven Whitaker, stwhit@umich.edu
 
 
 ## SMS/3D recon without B0 correction
@@ -23,26 +20,7 @@ s[1]        (Nx, Ny, nSlices)   coil 1 sensitivity map
 ```
 
 ## Installation
-
-1. Start Julia and press `]` to enter the Julia package manager
-
-2. Activate environment
-```
-(@v1.7) pkg> activate .         # Set environment specified in Project.toml
-```
-
-3. Instantiate 
-This will update Project.toml and Manifest.toml accordingly.
-
-3. Download dependencies
-```
-(3DEPI_example) pkg> instantiate
-```
-
-4. Press `backspace` to exit the package manager and get back to the Julia prompt.
-
-More info on packages and environments in Julia:
-https://pkgdocs.julialang.org/v1/
+[Install.md](Install.md)
 
 
 ## Example workflow
