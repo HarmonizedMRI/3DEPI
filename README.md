@@ -1,5 +1,5 @@
 # Misc code for 3D EPI
 
-This folder: 3D/SMS reconstruction in Julia
+./recon/sense/: 3D/SMS SENSE reconstruction with B0 correction (Julia)
 
-./caipi/: generate CAIPI sampling patterns in Python
+./caipi/: generate CAIPI sampling patterns (Python)
