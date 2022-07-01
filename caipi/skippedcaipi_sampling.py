@@ -36,13 +36,12 @@ if __name__ == "__main__":
     import sys
     import skippedcaipi_sampling
 
-    Ry = int(sys.argv[1]) # Undersampling factor along y (primary phase encode direction, w.l.o.g.)
-    Rz = int(sys.argv[2]) # Undersampling factor along z (slice direction, w.l.o.g.)
-    Dz = int(sys.argv[3]) # CAIPI shift along z
-    S = int(sys.argv[4])  # Segmentation factor (typically 1, for fMRI)
-
-    matrix_size_y = int(sys.argv[5])
-    matrix_size_z = int(sys.argv[6])
+    matrix_size_y = int(sys.argv[1])
+    matrix_size_z = int(sys.argv[2])
+    Ry = int(sys.argv[3]) # Undersampling factor along y (primary phase encode direction, w.l.o.g.)
+    Rz = int(sys.argv[4]) # Undersampling factor along z (slice direction, w.l.o.g.)
+    Dz = int(sys.argv[5]) # CAIPI shift along z
+    S = int(sys.argv[6])  # Segmentation factor (typically 1, for fMRI)
 
     # Create an instance of the blipped-CAIPI object 
     blippedcaipi = skippedcaipi_sampling.skippedcaipi_sampling(matrix_size_y, matrix_size_z, Ry, Rz, Dz, SegmentationFactor=S)
