@@ -52,8 +52,10 @@ More info on packages and environments in Julia:
 https://pkgdocs.julialang.org/v1/
 
 
-## Add Julia support in Vim (optional)
 
+## Julia tips
+
+### Add Julia support in Vim
 ```
 cd ~/.vim
 mkdir -p pack/plugins/start && cd pack/plugins/start
