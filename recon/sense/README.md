@@ -19,8 +19,9 @@ s[1]        (Nx, Ny, nSlices)   coil 1 sensitivity map
 Ω           (Nx, Ny, nSlices)   Cartesian k-space sampling mask. sum(Ω) = Nk
 ```
 
-## Installation
-[Install.md](Install.md)
+## Setup
+
+[Setup.md](Setup.md)
 
 
 ## Example workflow
