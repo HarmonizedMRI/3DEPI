@@ -38,10 +38,10 @@ function recon(y, s, Ω; kwargs...)
 
 end
 
-function _recon(y, s, A, Ω; λ = 0, kwargs...)
+function _recon(y, s, A, Ω; λ = 0, diff_dims = 1:ndims(Ω), kwargs...)
 
     ncoils = length(s)
-    T = diffop(size(Ω))
+    T = diffop(size(Ω); dims = diff_dims)
     cost = x -> sum(0.5 * norm(A[c] * x - y[c])^2 for c = 1:ncoils) + λ * norm(T * x)^2
     fun = (x, iter) -> cost(x)
     gradf = [[v -> v - y for y in y]; v -> 2λ * v]
