@@ -81,6 +81,29 @@ function adjointmodel(y, s, ϕ, U, V, Ω)
 
 end
 
+struct SENSEWorkspace{T,N,P1,P2}
+    x::Array{T,N}
+    y::Vector{T}
+    sx::Array{T,N}
+    yfull::Array{T,N}
+    fft_plan::P1
+    bfft_plan::P2
+    shift::Array{T,N}
+end
+
+function SENSEWorkspace(s, Ω)
+
+    x = similar(s)
+    y = similar(s, count(Ω))
+    sx = similar(s)
+    yfull = similar(s)
+    fft_plan = plan_fft(s)
+    bfft_plan = plan_bfft(s)
+    shift = similar(s)
+    return SENSEWorkspace(x, y, sx, yfull, fft_plan, bfft_plan, shift)
+
+end
+
 """
     forwardmodel(x, s, Ω)
 
@@ -91,6 +114,28 @@ function forwardmodel(x, s, Ω)
 
     y = ffts(s .* x)[Ω]
     return y
+
+end
+
+function forwardmodel(x, s, Ω, workspace)
+
+    workspace.sx .= s .* x
+
+    # Compute `workspace.yfull = fftshift(fft(ifftshift(workspace.sx)))`
+    ffts!(workspace.yfull, workspace.sx, workspace.fft_plan, workspace)
+
+    # The following for loop computes
+    # `workspace.y .= workspace.yfull[Ω]`
+    # without allocating a temporary array for workspace.yfull[Ω]
+    i = 0
+    for j in eachindex(Ω, workspace.yfull)
+        if Ω[j]
+            i += 1
+            workspace.y[i] = workspace.yfull[j]
+        end
+    end
+
+    return workspace.y
 
 end
 
@@ -108,8 +153,41 @@ function adjointmodel(y, s, Ω)
 
 end
 
+function adjointmodel(y, s, Ω, workspace)
+
+    # Zero-fill the k-space data
+    i = 0
+    for j in eachindex(Ω, workspace.yfull)
+        if Ω[j]
+            i += 1
+            workspace.yfull[j] = y[i]
+        else
+            workspace.yfull[j] = 0
+        end
+    end
+
+    # Compute `workspace.sx = fftshift(bfft(ifftshift(workspace.yfull)))`
+    ffts!(workspace.sx, workspace.yfull, workspace.bfft_plan, workspace)
+
+    workspace.x .= conj.(s) .* workspace.sx
+
+    return workspace.x
+
+end
+
 ffts(X) = fftshift(fft(ifftshift(X)))
 bffts(Y) = fftshift(bfft(ifftshift(Y)))
+
+function ffts!(Y, X, plan, workspace)
+
+    # Compute `Y = fftshift(fft(ifftshift(X)))`
+    # (`fft` could be `bfft`, `ifft`, etc. depending on `plan`)
+    ifftshift!(workspace.shift, X)
+    mul!(Y, plan, workspace.shift)
+    fftshift!(workspace.shift, Y)
+    Y .= workspace.shift
+
+end
 
 encodingmatrix(s, ϕ, U, V, Ω) = LinearMapAA(
     x -> forwardmodel(x, s, ϕ, U, V, Ω),
@@ -119,10 +197,15 @@ encodingmatrix(s, ϕ, U, V, Ω) = LinearMapAA(
     T = ComplexF64
 )
 
-encodingmatrix(s, Ω) = LinearMapAA(
-    x -> forwardmodel(x, s, Ω),
-    y -> adjointmodel(y, s, Ω),
-    (count(Ω), length(Ω));
-    idim = size(Ω),
-    T = ComplexF64
-)
+function encodingmatrix(s, Ω)
+
+    workspace = SENSEWorkspace(s, Ω)
+    return LinearMapAA(
+        x -> forwardmodel(x, s, Ω, workspace),
+        y -> adjointmodel(y, s, Ω, workspace),
+        (count(Ω), length(Ω));
+        idim = size(Ω),
+        T = ComplexF64
+    )
+
+end

@@ -3,6 +3,26 @@
 Can also correct for through-voxel B0 gradients.  
 
 
+## Note about branch stw/in-place
+In branch swt/in-place,
+I attempted to speed up the reconstruction
+by using in-place operations
+for `forwardmodel` and `adjointmodel`.
+Unfortunately, things got slower,
+from about 16 s to about 20 s,
+as measured by the following code.
+```julia
+using EPI3D
+(nx, ny, nz, nc) = (92, 92, 72, 58)
+s = [rand(ComplexF64, nx, ny, nz) for c = 1:nc]
+Ω = trues(nx, ny, nz)
+y = [rand(ComplexF64, count(Ω)) for c = 1:nc]
+@time recon(y, s, Ω; niter = 1, ninner = 1);
+```
+Though I did reduce memory allocations
+from 24.6 GB to 11.4 GB!
+
+
 ## SMS/3D recon without B0 correction
 
 The Julia function `recon` in the EPI3D package can be called as follows:
