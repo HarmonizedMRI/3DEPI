@@ -1,5 +1,5 @@
 """
-    phasecorrect!(y, z_start, nz, Δ, Ω)
+    phasecorrect!(y, z_start, nz, Ω)
 
 Correct the phase of multicoil k-space data `y`
 for a set of simultaneously excited slices.
@@ -15,12 +15,9 @@ does not necessarily align with isocenter
   then `z_start = 2`)
 - `nz`: Total number of slices in the imaging volume
   (*not* the number of simultaneously excited slices)
-- `Δ`: Image resolution [Δx, Δy, Δz]
-  (in particular, `Δ[3]` is *not* the interslice spacing
-  of the simultaneously excited slices)
 - `Ω`: SMS k-space sampling mask
 """
-function phasecorrect!(y, z_start, nz, Δ, Ω)
+function phasecorrect!(y, z_start, nz, Ω)
 
     nexcited = size(Ω, 3) # Number of simultaneously excited slices
     nexcitations = nz ÷ nexcited # Number of sets of simultaneously excited slices
@@ -34,20 +31,24 @@ function phasecorrect!(y, z_start, nz, Δ, Ω)
     z_iso = nz ÷ 2 + 1 # Center of full volume
     # Center of set of simultaneously excited slices
     z_excited = z_start + nexcitations * (nexcited ÷ 2)
-    z_offset = (z_excited - z_iso) * Δ[3]
+    # For z_offset, one could multiply by the slice thickness, but that ends up
+    # canceling out below anyway (because of the z_offset * kz)
+    z_offset = z_excited - z_iso
 
     # k-space sample spacing
+    # Normally one also needs to divide by the voxel size, but that cancels out
+    # below due to the multiplication by z_offset
     Δk = (
-        1 / (size(Ω, 1) * Δ[1]), # 1 / FOV
-        1 / (size(Ω, 2) * Δ[2]), # 1 / FOV
-        1 / (nz * Δ[3]) # 1 / FOV
+        1 / size(Ω, 1), # 1 / FOV
+        1 / size(Ω, 2), # 1 / FOV
+        1 / nz # 1 / FOV
     )
 
     # k-space sample locations
-    kdim = d -> (-size(Ω, d)÷2:size(Ω, d)÷2-iseven(size(Ω, d))) * Δk[d]
-    kx = kdim(1)
-    ky = kdim(2)
-    kz = kdim(3)
+    (kx, ky, kz) = ntuple(3) do d
+        n = size(Ω, d)
+        (-n÷2:n÷2-iseven(n)) * Δk[d]
+    end
     kz = [kz for kx in kx, ky in ky, kz in kz][Ω]
 
     # Do phase correction for each coil
